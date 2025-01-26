@@ -29,3 +29,45 @@ body {
     color: #fff;
     transition: all 0.3s ease;
   }
+
+  .box-wrapper {
+    perspective: 1000px;
+  }
+  
+  .box-input {
+    transition: background-color 0.3s, transform 0.3s;
+  }
+  
+  .correct {
+    background-color: #6aaa64;
+    color: white;
+  }
+  
+  .wrong-position {
+    background-color: #c9b458;
+    color: white;
+  }
+  
+  .wrong {
+    background-color: #787c7e;
+    color: white;
+  }
+  
+  .reset-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #ffffff;
+    background-color: #1e1e1e;
+    border: 2px solid #555;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .reset-button:hover {
+    background-color: #ffffff;
+    color: #121212;
+  }

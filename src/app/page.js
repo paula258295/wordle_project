@@ -1,11 +1,15 @@
 import React from 'react';
 import GameGrid from './components/GameGrid';
+import Header from './components/Header';
 
 export default function Page() {
   return (
     <div>
-      <h1>Wordle</h1>
-      <GameGrid />
+      <Header />
+      <div>
+        <h1>Guess the word!</h1>
+        <GameGrid />
+      </div>
     </div>
   );
 }

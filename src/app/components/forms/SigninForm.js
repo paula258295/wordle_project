@@ -26,30 +26,34 @@ export function SigninForm() {
     onSubmit: async (values) => {
       try {
         console.log("Attempting login with values:", values);
-
+    
         const response = await fetch(`${API_URL}/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify(values),
         });
-
+    
+        console.log("Response status:", response.status);
+        const data = await response.json();
+        console.log("Response data:", data);
+    
         if (!response.ok) {
-          const errorData = await response.json();
-          alert(errorData.error);
-          console.log("Login failed:", errorData.error);
+          alert(data.error || 'Login failed');
+          console.log("Login failed:", data.error);
           return;
         }
-
-        const loginData = await response.json();
+    
+        const loginData = data;
         console.log("Login successful:", loginData);
-
+    
         alert("Login successful! Redirecting to the homepage...");
-        router.push(`/?id=${loginData.user.id}`);
+        router.push('/');
       } catch (error) {
         console.error("Error:", error);
         alert("An error occurred. Please try again.");
       }
-    },
+    }
   });
 
   return (
@@ -113,3 +117,4 @@ export function SigninForm() {
     </div>
   );
 }
+

@@ -1,33 +1,34 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const API_URL = "http://localhost:3001";
 
 const AccountPage = () => {
-  const searchParams = useSearchParams();
-  const userId = searchParams.get("id");
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    if (userId) {
-      fetch(`${API_URL}/users/${userId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.error) {
-            console.error("Error fetching user:", data.error);
-          } else {
-            setUser(data);
-          }
-        })
-        .catch((error) => console.error("Fetch error:", error));
-    }
-  }, [userId]);
+    const fetchUser = async () => {
+      try {
+        const response = await fetch(`${API_URL}/current-user`, {
+          credentials: "include",
+        });
 
-  if (!user) {
-    return <p>Loading user data...</p>;
-  }
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  if (!user) return <p>Loading user data...</p>;
 
   return (
     <div>

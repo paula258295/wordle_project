@@ -1,12 +1,18 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 const port = 3001;
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true,
+}));
+
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 let users = [];
 
@@ -19,13 +25,13 @@ app.post("/users", (req, res) => {
   }
 
   users.push(newUser);
-  console.log("New user added:", newUser); 
+  console.log("New user added:", newUser);
   res.status(201).json(newUser);
 });
 
 app.get("/users", (req, res) => {
-  res.json(users);
-});
+    res.json(users);
+  });
 
 app.get("/users/:id", (req, res) => {
   const user = users.find((u) => u.id === req.params.id);
@@ -70,8 +76,44 @@ app.post("/login", (req, res) => {
 
   console.log("User logged in:", user);
 
+  res.cookie("userId", user.id, {
+    maxAge: 365 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+  });
+
   res.json({ message: "Login successful", user });
 });
+
+app.post("/logout", (req, res) => {
+    res.clearCookie("userId", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None", 
+    });
+    res.json({ message: "Logout successful" });
+  });
+
+app.get("/current-user", (req, res) => {
+  const userId = req.cookies.userId;
+  if (!userId) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  const user = users.find((u) => u.id === userId);
+  if (!user) {
+    return res.json({ error: "User not found" });
+  }
+
+  res.json(user);
+});
+
+app.get("/check-cookie", (req, res) => {
+    console.log("Cookies received:", req.cookies);
+    res.json({ cookie: req.cookies.userId || "No cookie found" });
+  });
+  
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

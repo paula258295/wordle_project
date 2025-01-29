@@ -80,6 +80,7 @@ export function SignupForm() {
             email: values.email,
             password: values.password,
           }),
+          credentials: "include",
         });
     
         if (!loginResponse.ok) {
@@ -93,7 +94,7 @@ export function SignupForm() {
         console.log("Logged in user:", loggedInUser);
     
         alert("Registration and login successful! Redirecting to the homepage...");
-        router.push(`/?id=${loggedInUser.user.id}`);
+        router.push('/');
       } catch (error) {
         console.error("Error:", error);
         alert("An error occurred. Please try again.");

@@ -1,46 +1,47 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
 import "./Header.css";
 
 const API_URL = "http://localhost:3001";
 
 const Header = () => {
   const [user, setUser] = useState(null);
-  const searchParams = useSearchParams();
-  const userId = searchParams.get("id");
-  const router = useRouter();
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (!userId) return; 
-
       try {
-        const response = await fetch(`${API_URL}/users/${userId}`, {
-          method: "GET",
+        const response = await fetch(`${API_URL}/current-user`, {
+          credentials: "include",
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch user data");
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        } else {
+          setUser(null);
         }
-
-        const data = await response.json();
-        setUser(data);
       } catch (error) {
         console.error("Error fetching user:", error);
-        setUser(null);
       }
     };
 
     fetchUser();
-  }, [userId]);
+  }, []);
 
-  const handleLogout = () => {
-    setUser(null);
-    router.push("/");
-    alert("You have been logged out successfully.");
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API_URL}/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      setUser(null);
+      alert("You have been logged out successfully.");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   return (

@@ -33,11 +33,11 @@ const AccountPage = () => {
   return (
     <div>
       <h1>Account Page</h1>
-      <p><strong>First Name:</strong> {user.firstName}</p>
+      <p><strong>First Name:</strong> {user.firstname}</p>
       <p><strong>Surname:</strong> {user.surname}</p>
       <p><strong>Email:</strong> {user.email}</p>
       <p><strong>Username:</strong> {user.username}</p>
-      <p><strong>Date of Birth:</strong> {user.dateOfBirth}</p>
+      <p><strong>Date of Birth:</strong> {new Date(user.dateofbirth).toISOString().split('T')[0]}</p>
     </div>
   );
 };

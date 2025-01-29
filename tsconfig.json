@@ -28,7 +28,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "src/app/(auth)/signin/page.js", "src/app/(auth)/signup/page.js", "src/app/components/forms/SignupForm.js", "src/app/components/forms/SigninForm.js", "src/app/account/page.js", "src/app/account/layout.js", "src/app/edit-profile/page.js", "src/app/edit-profile/layout.tjs", "src/app/edit-profile/EditAccount.js"  ],
   "exclude": [
     "node_modules"
   ]

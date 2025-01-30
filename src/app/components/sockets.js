@@ -16,19 +16,38 @@ app.use(cors());
 app.use(express.json());
 
 let chatHistory = [];
+let activeUsers = {};
+let uniqueUsers = new Set();
 
 io.on("connection", (socket) => {
   console.log("Użytkownik połączony:", socket.id);
 
+  const username = socket.handshake.query.username;
+  if (username) {
+    activeUsers[socket.id] = username;
+    uniqueUsers.add(username);
+    console.log(`Dodano użytkownika: ${username}`);
+
+    io.emit("updateUsers", Array.from(uniqueUsers));
+  }
+
   socket.emit("chatHistory", chatHistory);
 
   socket.on("sendMessage", (data) => {
-    chatHistory.push(data);
-    io.emit("receiveMessage", data);
+    const message = { username, text: data.text };
+    chatHistory.push(message);
+
+    io.emit("receiveMessage", message);
   });
 
   socket.on("disconnect", () => {
-    console.log("Użytkownik rozłączony:", socket.id);
+    console.log(`Użytkownik rozłączony: ${socket.id}`);
+    
+    if (activeUsers[socket.id]) {
+      delete activeUsers[socket.id];
+      uniqueUsers = new Set(Object.values(activeUsers));
+      io.emit("updateUsers", Array.from(uniqueUsers));
+    }
   });
 });
 

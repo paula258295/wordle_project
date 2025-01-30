@@ -3,57 +3,55 @@
 import { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:3002");
 const API_URL = "http://localhost:3001";
+
+async function fetchUser() {
+  try {
+    const response = await fetch(`${API_URL}/current-user`, {
+      credentials: "include",
+    });
+    if (response.ok) return await response.json();
+  } catch (error) {
+    console.error("Błąd pobierania użytkownika:", error);
+  }
+  return null;
+}
 
 export default function Chat() {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
   const [user, setUser] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch(`${API_URL}/current-user`, {
-          credentials: "include",
+    fetchUser().then((userData) => {
+      if (userData) {
+        setUser(userData);
+
+        const newSocket = io("http://localhost:3002", {
+          query: { username: userData.username },
         });
 
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
+        setSocket(newSocket);
+
+        newSocket.on("chatHistory", (history) => setChat(history));
+        newSocket.on("receiveMessage", (data) => setChat((prevChat) => [...prevChat, data]));
+        newSocket.on("updateUsers", (usersList) => setUsers(usersList));
+
+        return () => {
+          newSocket.disconnect();
+        };
       }
-    };
-
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
-    socket.on("chatHistory", (history) => {
-      setChat(history);
     });
-
-    socket.on("receiveMessage", (data) => {
-      setChat((prevChat) => [...prevChat, data]);
-    });
-
-    return () => {
-      socket.off("chatHistory");
-      socket.off("receiveMessage");
-    };
   }, []);
 
   const sendMessage = () => {
-    if (message.trim() && user) {
-      const chatMessage = { username: user.username, text: message };
-      socket.emit("sendMessage", chatMessage);
+    if (message.trim() && socket) {
+      socket.emit("sendMessage", { text: message });
       setMessage("");
     }
-  };
+  }
 
   if (!user) {
     return <p>User loading...</p>;
@@ -61,21 +59,31 @@ export default function Chat() {
 
   return (
     <div>
-      <h2>Online chat</h2>
       <div>
-        {chat.map((msg, i) => (
-          <p key={i}>
-            <strong>{msg.username}:</strong> {msg.text}
-          </p>
-        ))}
+        <h3>Active users:</h3>
+        <ul>
+          {users.map((username, i) => (
+            <li key={i}>{username}</li>
+          ))}
+        </ul>
       </div>
-      <input
-        type="text"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder="Message..."
-      />
-      <button onClick={sendMessage}> Send </button>
+      <div>
+        <h2>Online chat</h2>
+        <div>
+          {chat.map((msg, i) => (
+            <p key={i}>
+              <strong>{msg.username}:</strong> {msg.text}
+            </p>
+          ))}
+        </div>
+        <input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Message..."
+        />
+        <button onClick={sendMessage}> Send </button>
+      </div>
     </div>
   );
 }

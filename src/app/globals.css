@@ -2,9 +2,7 @@ body {
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
     align-items: center;
-    height: 100vh;
     margin: 0;
     background-color: #1e1e1e;
     color: white;
@@ -12,6 +10,12 @@ body {
   div {
     h1 {
         color: rgb(255, 255, 255);
+        padding-top: 60px;
       }
+  }
+
+  .main{
+    display: flex;
+    gap: 30%;
   }
   

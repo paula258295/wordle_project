@@ -9,8 +9,10 @@ export default function Page() {
       <Header />
       <div>
         <h1>Guess the word!</h1>
-        <GameGrid />
-        <Chat />
+        <div className='main'>
+          <GameGrid className='game'/>
+          <Chat className='chat'/>
+        </div>
       </div>
     </div>
   );

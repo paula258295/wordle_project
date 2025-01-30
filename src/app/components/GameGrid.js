@@ -1,6 +1,10 @@
-'use client'
+'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import './GameGrid.css';
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:3002");
+const API_URL = "http://localhost:3001";
 
 export default function GameGrid() {
   const SECRET_WORD = 'APPLE';
@@ -9,7 +13,31 @@ export default function GameGrid() {
   const [currentRow, setCurrentRow] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const [guesses, setGuesses] = useState([]);
+  const [leader, setLeader] = useState(null);
   const inputRefs = useRef([]);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+      const fetchUser = async () => {
+        try {
+          const response = await fetch(`${API_URL}/current-user`, {
+            credentials: "include",
+          });
+  
+          if (response.ok) {
+            const userData = await response.json();
+            setUser(userData);
+          } else {
+            setUser(null);
+          }
+        } catch (error) {
+          console.error("Error fetching user:", error);
+        }
+      };
+  
+      fetchUser();
+    }, []);
+    
 
   const checkGuess = (guess) => {
     let result = new Array(guess.length).fill('wrong');
@@ -64,8 +92,7 @@ export default function GameGrid() {
             inputRefs.current[nextIndex]?.focus();
         }
     }
-};
-
+  };
 
   const handleKeyDown = (e, index) => {
     if (e.key === 'Backspace' && grid[index] === '' && index > 0) {
@@ -85,6 +112,7 @@ export default function GameGrid() {
         if (guess === SECRET_WORD) {
           alert('Congratulations, you guessed the word!');
           setIsGameOver(true);
+          socket.emit("gameWin", user.username);
           if (window.confirm('Do you want to play again?')) {
             resetGame();
           }
@@ -111,10 +139,18 @@ export default function GameGrid() {
     if (currentRow < 6 && inputRefs.current[currentRow * 5]) {
       inputRefs.current[currentRow * 5].focus();
     }
+
+    socket.on("leaderboard", (user) => {
+      setLeader(user);
+    });
+
+    return () => {
+      socket.off("leaderboard");
+    };
   }, [currentRow]);
 
-
   return (
+    <div>
     <div className='game-grid'>
       {grid.map((letter, index) => {
         let className = '';
@@ -142,14 +178,25 @@ export default function GameGrid() {
               onKeyDown={(e) => handleKeyDown(e, index)}
               disabled={isGameOver || !isRowEditable(index)}
           />
-
         );
       })}
+      </div>
       <div>
         <button className='reset-button' onClick={resetGame}>
           reset game
         </button>
       </div>
-    </div>
+
+      
+    
+      <div>
+      {leader && (
+        <div className="leaderboard">
+          <h3>Leader of the Day:</h3>
+          <p>{leader.username} with {leader.wins} wins</p>
+        </div>
+      )}
+      </div>
+      </div>
   );
 }

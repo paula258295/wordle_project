@@ -51,6 +51,47 @@ io.on("connection", (socket) => {
   });
 });
 
+let userWins = {}; 
+
+const getLeader = () => {
+  let leader = { username: '', wins: 0 };
+  for (let userId in userWins) {
+    if (userWins[userId] > leader.wins) {
+      leader = { username: userId, wins: userWins[userId] };
+    }
+  }
+  return leader;
+};
+
+io.on("connection", (socket) => {
+  console.log("Użytkownik połączony:", socket.id);
+
+  const username = socket.handshake.query.username;
+  
+  if (username) {
+    activeUsers[socket.id] = username;
+    console.log(`Zidentyfikowano użytkownika ${username}`);
+
+    io.emit("leaderboard", getLeader());
+  }
+
+  socket.on("gameWin", (username) => {
+    if (username) {
+      if (!userWins[username]) {
+        userWins[username] = 0;
+      }
+      userWins[username]++;
+      
+      io.emit("leaderboard", getLeader());
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`Użytkownik rozłączony: ${socket.id}`);
+    delete activeUsers[socket.id];
+  });
+});
+
 server.listen(3002, () => {
   console.log("Serwer WebSocket działa na porcie 3002");
 });

@@ -63,9 +63,14 @@ const Header = () => {
               </Link>
 
               {user.firstname.toLowerCase() === "admin" && (
+                <>
                 <Link href="/admin">
                   <button className="button admin-button">Admin Panel</button>
                 </Link>
+                <Link href="/words-list">
+                  <button className="button admin-button">Manage Words</button>
+                </Link>
+              </>
               )}
 
               <button className="button logout-button" onClick={handleLogout}>

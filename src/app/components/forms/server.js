@@ -243,6 +243,75 @@ bcrypt.hash(adminPassword, saltRounds, (err, hashedPassword) => {
 });
 
 
+app.get("/words", async (req, res) => {
+    try {
+        const result = await pool.query("SELECT id, word FROM words");
+        res.json(result.rows);
+    } catch (error) {
+        console.error("Error fetching words:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+
+app.post("/words", async (req, res) => {
+    const { word } = req.body;
+
+    try {
+        const existingWord = await pool.query("SELECT * FROM words WHERE word = $1", [word.toUpperCase()]);
+        if (existingWord.rows.length > 0) {
+            return res.status(400).json({ error: "Word already exists" });
+        }
+
+        const result = await pool.query(
+            "INSERT INTO words (word) VALUES ($1) RETURNING *",
+            [word.toUpperCase()]
+        );
+
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error("Error adding word:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+app.delete("/words/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query("DELETE FROM words WHERE id = $1 RETURNING *", [id]);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: "Word not found" });
+        }
+
+        res.status(200).json({ message: "Word deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting word:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+app.put("/words/:id", async (req, res) => {
+    const { id } = req.params;
+    const { word } = req.body;
+
+    try {
+        const existingWord = await pool.query("SELECT * FROM words WHERE id = $1", [id]);
+        if (existingWord.rows.length === 0) {
+            return res.status(404).json({ error: "Word not found" });
+        }
+
+        const result = await pool.query(
+            "UPDATE words SET word = $1 WHERE id = $2 RETURNING *",
+            [word.toUpperCase(), id]
+        );
+
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error("Error updating word:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 
 
 

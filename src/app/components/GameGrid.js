@@ -7,8 +7,10 @@ const socket = io("http://localhost:3002");
 const API_URL = "http://localhost:3001";
 
 export default function GameGrid() {
-  const SECRET_WORD = 'APPLE';
-  const VALID_WORDS = ['APPLE', 'GRAPE', 'PEACH', 'PLUMB', 'MANGO', 'BERRY', 'REACT'];
+  // const SECRET_WORD = 'APPLE';
+  // const VALID_WORDS = ['APPLE', 'GRAPE', 'PEACH', 'PLUMB', 'MANGO', 'BERRY', 'REACT'];
+  const [validWords, setValidWords] = useState([]);
+  const [secretWord, setSecretWord] = useState('');
   const [grid, setGrid] = useState(Array(30).fill(''));
   const [currentRow, setCurrentRow] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
@@ -37,11 +39,29 @@ export default function GameGrid() {
   
       fetchUser();
     }, []);
+
+
+  useEffect(() => {
+    const fetchWords = async () => {
+      try {
+        const res = await fetch("http://localhost:3001/words", { credentials: "include" });
+        if (!res.ok) throw new Error("Failed to fetch words");
+
+        const data = await res.json();
+        setValidWords(data.map(word => word.word));
+      } catch (error) {
+        console.error("Error fetching words:", error);
+      }
+    };
+
+    fetchWords();
+  }, []);
+
     
 
   const checkGuess = (guess) => {
     let result = new Array(guess.length).fill('wrong');
-    let secretLetters = SECRET_WORD.split('');
+    let secretLetters = secretWord.split('');
     let secretCount = {};
 
     for (let letter of secretLetters) {
@@ -102,14 +122,14 @@ export default function GameGrid() {
     if (e.key === 'Enter') {
       const guess = grid.slice(currentRow * 5, (currentRow + 1) * 5).join('');
       if (guess.length === 5) {
-        if (!VALID_WORDS.includes(guess)) {
+        if (!validWords.includes(guess)) {
           alert('This word is not in the list of valid words!');
           return;
         }
 
         const result = checkGuess(guess);
 
-        if (guess === SECRET_WORD) {
+        if (guess === secretWord) {
           alert('Congratulations, you guessed the word!');
           setIsGameOver(true);
           socket.emit("gameWin", user.username);
@@ -121,9 +141,9 @@ export default function GameGrid() {
           setCurrentRow((prevRow) => prevRow + 1);
         }
 
-        if (currentRow === 5 && guess !== SECRET_WORD) {
+        if (currentRow === 5 && guess !== secretWord) {
           setIsGameOver(true);
-          if (window.confirm(`Game Over! The word was: ${SECRET_WORD}. Do you want to play again?`)) {
+          if (window.confirm(`Game Over! The word was: ${secretWord}. Do you want to play again?`)) {
             resetGame();
           }
         }

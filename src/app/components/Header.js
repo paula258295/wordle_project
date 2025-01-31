@@ -62,6 +62,12 @@ const Header = () => {
                 <button className="button account-button">My Account</button>
               </Link>
 
+              {user.firstname.toLowerCase() === "admin" && (
+                <Link href="/admin">
+                  <button className="button admin-button">Admin Panel</button>
+                </Link>
+              )}
+
               <button className="button logout-button" onClick={handleLogout}>
                 Logout
               </button>

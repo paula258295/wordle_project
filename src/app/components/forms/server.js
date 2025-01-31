@@ -94,12 +94,12 @@ app.get("/users/:id", async (req, res) => {
 
 app.put("/users/:id", async (req, res) => {
     const { id } = req.params;
-    const { username } = req.body;
-    
+    const { firstName, surname, email, username } = req.body;
+  
     try {
       const result = await pool.query(
-        "UPDATE users SET username = $1 WHERE id = $2 RETURNING *",
-        [username, id]
+        "UPDATE users SET firstname = $1, surname = $2, email = $3, username = $4 WHERE id = $5 RETURNING *",
+        [firstName, surname, email, username, id]
       );
   
       if (result.rows.length === 0) {
@@ -145,7 +145,7 @@ app.get("/users/search/:query", async (req, res) => {
       res.status(500).json({ error: "An error occurred while searching users" });
     }
   });
-  
+
 
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
@@ -235,7 +235,15 @@ app.get("/check-cookie", (req, res) => {
     console.log("Cookies received:", req.cookies);
     res.json({ cookie: req.cookies.userId || "No cookie found" });
   });
-  
+
+  const adminPassword = 'admin';
+bcrypt.hash(adminPassword, saltRounds, (err, hashedPassword) => {
+  if (err) throw err;
+  console.log(hashedPassword);
+});
+
+
+
 
 
 

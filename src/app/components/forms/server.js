@@ -314,6 +314,74 @@ app.put("/words/:id", async (req, res) => {
 });
 
 
+app.get("/notes", async (req, res) => {
+  const userId = req.cookies.userId;
+  if (!userId) return res.status(401).json({ error: "Not authenticated" });
+
+  try {
+    const result = await pool.query("SELECT * FROM notes WHERE user_id = $1 ORDER BY created_at DESC", [userId]);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching notes:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/notes", async (req, res) => {
+  const userId = req.cookies.userId;
+  const { content } = req.body;
+
+  if (!userId || !content) return res.status(400).json({ error: "Missing user_id or content" });
+
+  try {
+    const result = await pool.query(
+      "INSERT INTO notes (user_id, content, created_at) VALUES ($1, $2, NOW()) RETURNING *",
+      [userId, content]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error adding note:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.put("/notes/:id", async (req, res) => {
+  const userId = req.cookies.userId;
+  const { content } = req.body;
+  const noteId = req.params.id;
+
+  if (!content) return res.status(400).json({ error: "Content is required" });
+
+  try {
+    const result = await pool.query(
+      "UPDATE notes SET content = $1 WHERE id = $2 AND user_id = $3 RETURNING *",
+      [content, noteId, userId]
+    );
+
+    if (result.rowCount === 0) return res.status(404).json({ error: "Note not found or unauthorized" });
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error updating note:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.delete("/notes/:id", async (req, res) => {
+  const userId = req.cookies.userId;
+  const noteId = req.params.id;
+
+  try {
+    const result = await pool.query("DELETE FROM notes WHERE id = $1 AND user_id = $2 RETURNING *", [noteId, userId]);
+
+    if (result.rowCount === 0) return res.status(404).json({ error: "Note not found or unauthorized" });
+
+    res.json({ message: "Note deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting note:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 
 app.listen(port, () => {

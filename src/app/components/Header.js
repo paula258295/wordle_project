@@ -72,6 +72,9 @@ const Header = () => {
                 </Link>
               </>
               )}
+              <Link href="/notes-list">
+                  <button className="button notes-button">Notes</button>
+              </Link>
 
               <button className="button logout-button" onClick={handleLogout}>
                 Logout

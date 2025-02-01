@@ -384,6 +384,61 @@ app.delete("/notes/:id", async (req, res) => {
 });
 
 
+
+
+
+app.put("/update-profile", async (req, res) => {
+  const userId = req.cookies.userId;
+  if (!userId) {
+      return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  const { firstname, surname, dateOfBirth, username, email, profile_description } = req.body;
+
+  try {
+      const result = await pool.query(
+          `UPDATE users 
+           SET firstname = $1, surname = $2, dateofbirth = $3, username = $4, email = $5, profile_description = $6
+           WHERE id = $7 RETURNING id, firstname, surname, dateofbirth, username, email, profile_description`,
+          [firstname, surname, dateOfBirth, username, email, profile_description, userId]
+      );
+
+      if (result.rowCount === 0) {
+          return res.status(404).json({ error: "User not found" });
+      }
+
+      res.json(result.rows[0]);
+  } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
+app.delete("/delete-profile-description", async (req, res) => {
+  const userId = req.cookies.userId;
+
+  if (!userId) {
+      return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  try {
+      await pool.query(
+          "UPDATE users SET profile_description = NULL WHERE id = $1",
+          [userId]
+      );
+      
+      res.json({ message: "Profile description deleted successfully" });
+  } catch (error) {
+      console.error("Error deleting profile description:", error);
+      res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

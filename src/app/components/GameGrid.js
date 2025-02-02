@@ -3,12 +3,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import './GameGrid.css';
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:3002");
+const socket = io("ws://localhost:3002");
 const API_URL = "http://localhost:3001";
 
 export default function GameGrid() {
-  // const SECRET_WORD = 'APPLE';
-  // const VALID_WORDS = ['APPLE', 'GRAPE', 'PEACH', 'PLUMB', 'MANGO', 'BERRY', 'REACT'];
   const [validWords, setValidWords] = useState([]);
   const [secretWord, setSecretWord] = useState('');
   const [grid, setGrid] = useState(Array(30).fill(''));
@@ -57,7 +55,22 @@ export default function GameGrid() {
     fetchWords();
   }, []);
 
-    
+  useEffect(() => {
+    const fetchSecretWord = async () => {
+      try {
+        const res = await fetch(`${API_URL}/secret-word`, { credentials: "include" });
+        if (!res.ok) throw new Error("Failed to fetch secret word");
+  
+        const data = await res.json();
+        setSecretWord(data.word);
+      } catch (error) {
+        console.error("Error fetching secret word:", error);
+      }
+    };
+  
+    fetchSecretWord();
+  }, []);
+
 
   const checkGuess = (guess) => {
     let result = new Array(guess.length).fill('wrong');
@@ -65,38 +78,55 @@ export default function GameGrid() {
     let secretCount = {};
 
     for (let letter of secretLetters) {
-      secretCount[letter] = (secretCount[letter] || 0) + 1;
+        secretCount[letter] = (secretCount[letter] || 0) + 1;
     }
 
     for (let i = 0; i < guess.length; i++) {
-      if (guess[i] === secretLetters[i]) {
-        result[i] = 'correct';
-        secretCount[guess[i]] -= 1;
-      }
+        if (guess[i] === secretLetters[i]) {
+            result[i] = 'correct';
+            secretCount[guess[i]] -= 1;
+        }
     }
 
     for (let i = 0; i < guess.length; i++) {
-      if (result[i] === 'correct') continue;
-      if (secretCount[guess[i]] > 0) {
-        result[i] = 'wrong-position';
-        secretCount[guess[i]] -= 1;
-      }
+        if (result[i] === 'correct') continue;
+        if (secretCount[guess[i]] > 0) {
+            result[i] = 'wrong-position';
+            secretCount[guess[i]] -= 1;
+        }
+    }
+
+    if (guess === secretWord) {
+        result = new Array(guess.length).fill('correct');
     }
 
     return result;
-  };
+};
 
-  const resetGame = () => {
+  const resetGame = async () => {
     setGrid(Array(30).fill(''));
     setCurrentRow(0);
     setIsGameOver(false);
     setGuesses([]);
+
+    try {
+        const response = await fetch(`${API_URL}/secret-word`, { credentials: "include" });
+        if (response.ok) {
+            const data = await response.json();
+            setSecretWord(data.word);
+        } else {
+            console.error("Failed to fetch new secret word");
+        }
+    } catch (error) {
+        console.error("Error fetching new secret word:", error);
+    }
+
     setTimeout(() => {
-      if (inputRefs.current[0]) {
-        inputRefs.current[0].focus();
-      }
+        if (inputRefs.current[0]) {
+            inputRefs.current[0].focus();
+        }
     }, 100);
-  };
+};
 
   const handleInputChange = (e, index) => {
     const value = e.target.value.toUpperCase();
@@ -130,12 +160,23 @@ export default function GameGrid() {
         const result = checkGuess(guess);
 
         if (guess === secretWord) {
+          const correctResult = new Array(5).fill('correct');
+          setGuesses((prevGuesses) => {
+              const newGuesses = [...prevGuesses];
+              newGuesses[currentRow] = correctResult;
+              return newGuesses;
+          });
+      
           alert('Congratulations, you guessed the word!');
           setIsGameOver(true);
-          socket.emit("gameWin", user.username);
-          if (window.confirm('Do you want to play again?')) {
-            resetGame();
-          }
+          socket.emit("gameWin", user?.username);
+
+          setTimeout(async () => {
+            if (window.confirm('Do you want to play again?')) {
+                await resetGame();
+            }
+          }, 100);
+          return;
         } else {
           setGuesses((prevGuesses) => [...prevGuesses, result]);
           setCurrentRow((prevRow) => prevRow + 1);
@@ -171,34 +212,35 @@ export default function GameGrid() {
 
   return (
     <div>
-    <div className='game-grid'>
-      {grid.map((letter, index) => {
-        let className = '';
-        const guessRow = Math.floor(index / 5);
-        if (guesses[guessRow]) {
-          const result = guesses[guessRow][index % 5];
-          if (result === 'correct') {
-            className = 'correct';
-          } else if (result === 'wrong-position') {
-            className = 'wrong-position';
-          } else if (result === 'wrong') {
-            className = 'wrong';
-          }
-        }
+      <div className='game-grid'>
+        {grid.map((letter, index) => {
+          let className = '';
+          const guessRow = Math.floor(index / 5);
 
-        return (
-          <input
-              key={index}
-              ref={(el) => (inputRefs.current[index] = el)}
-              className={`box-input ${className}`}
-              value={letter}
-              maxLength={1}
-              type="text"
-              onChange={(e) => handleInputChange(e, index)}
-              onKeyDown={(e) => handleKeyDown(e, index)}
-              disabled={isGameOver || !isRowEditable(index)}
-          />
-        );
+          if (guesses[guessRow]) {
+              const result = guesses[guessRow][index % 5];
+              if (result === 'correct') {
+                  className = 'correct';
+              } else if (result === 'wrong-position') {
+                  className = 'wrong-position';
+              } else if (result === 'wrong') {
+                  className = 'wrong';
+              }
+          }
+
+          return (
+              <input
+                  key={index}
+                  ref={(el) => (inputRefs.current[index] = el)}
+                  className={`box-input ${className}`}
+                  value={letter}
+                  maxLength={1}
+                  type="text"
+                  onChange={(e) => handleInputChange(e, index)}
+                  onKeyDown={(e) => handleKeyDown(e, index)}
+                  disabled={isGameOver || !isRowEditable(index)}
+              />
+          );
       })}
       </div>
       <div>

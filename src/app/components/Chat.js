@@ -37,7 +37,7 @@ export default function Chat() {
       if (userData) {
         setUser(userData);
 
-        const newSocket = io("http://localhost:3002", {
+        const newSocket = io("ws://localhost:3002", {
           query: { username: userData.username },
         });
 

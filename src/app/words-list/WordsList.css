@@ -1,0 +1,132 @@
+.words-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 20px rgb(230, 82, 188);
+    margin-top: 60px;
+    padding-top: 0;
+  }
+  
+  .words-title {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .add-word-form {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .word-input {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #cbcbcb;
+  }
+  
+  .add-word-btn {
+    padding: 10px 20px;
+    background-color: #d74796;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  
+  .add-word-btn:hover {
+    background-color: #a6199a;
+  }
+  
+  .words-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .word-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .word-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .edit-btn, .delete-btn {
+    padding: 5px 10px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .edit-btn {
+    background-color: #ffa500;
+    color: white;
+  }
+  
+  .edit-btn:hover {
+    background-color: #e68900;
+  }
+  
+  .delete-btn {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .delete-btn:hover {
+    background-color: #d32f2f;
+  }
+  
+  .save-btn {
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 4px;
+    margin-right: 8px;
+  }
+  
+  .save-btn:hover {
+    background-color: #45a049;
+  }
+  
+  .cancel-btn {
+    padding: 5px 10px;
+    background-color: #409fcf;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .cancel-btn:hover {
+    background-color: #6d94ea;
+  }
+  
+  .no-words-text {
+    text-align: center;
+    font-size: 18px;
+    color: #888;
+  }
+  
+  .edit-word-input {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 75%;
+  }
+  

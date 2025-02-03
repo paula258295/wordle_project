@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from "react";
+import "./EditAccount.css"
 
 const ProfileUpdate = () => {
     const [user, setUser] = useState(null);
@@ -20,6 +21,7 @@ const ProfileUpdate = () => {
                 if (!res.ok) throw new Error("Failed to fetch user");
                 const data = await res.json();
                 setUser(data);
+
                 const formattedDate = new Date(data.dateofbirth).toISOString().split('T')[0];
                 setFormData({
                     firstname: data.firstname,
@@ -86,27 +88,105 @@ const ProfileUpdate = () => {
     };
 
     return (
-        <div>
-            <h2>Update Profile</h2>
+        <div className="form-container">
+            <h2 className="form-title">Update Profile</h2>
             {user ? (
-                <form onSubmit={handleSubmit}>
-                    <input type="text" name="firstname" value={formData.firstname} onChange={handleChange} placeholder="First Name" required />
-                    <input type="text" name="surname" value={formData.surname} onChange={handleChange} placeholder="Surname" required />
-                    <input type="date" name="dateofbirth" value={formData.dateofbirth} onChange={handleChange} required />
-                    <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Username" required />
-                    <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
-                    <textarea name="profile_description" value={formData.profile_description} onChange={handleChange} placeholder="Profile Description" />
-                    <button type="submit">Update Profile</button>
+                <form onSubmit={handleSubmit} className="form">
+                    <div className="my-div">
+                        <div className="form-group">
+                            <label htmlFor="firstname" className="form-label">First Name</label>
+                            <input
+                                type="text"
+                                id="firstname"
+                                name="firstname"
+                                value={formData.firstname}
+                                onChange={handleChange}
+                                placeholder="First Name"
+                                required
+                                className="form-input"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="surname" className="form-label">Surname</label>
+                            <input
+                                type="text"
+                                id="surname"
+                                name="surname"
+                                value={formData.surname}
+                                onChange={handleChange}
+                                placeholder="Surname"
+                                required
+                                className="form-input"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="dateofbirth" className="form-label">Date of Birth</label>
+                            <input
+                                type="date"
+                                id="dateofbirth"
+                                name="dateofbirth"
+                                value={formData.dateofbirth}
+                                onChange={handleChange}
+                                required
+                                className="form-input"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="username" className="form-label">Username</label>
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                value={formData.username}
+                                onChange={handleChange}
+                                placeholder="Username"
+                                required
+                                className="form-input"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="email" className="form-label">Email</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="Email"
+                                required
+                                className="form-input"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="profile_description" className="form-label">Profile Description</label>
+                            <textarea
+                                id="profile_description"
+                                name="profile_description"
+                                value={formData.profile_description}
+                                onChange={handleChange}
+                                placeholder="Profile Description"
+                                className="form-textarea"
+                            />
+                        </div>
+                    </div>
+                    
+                    <button type="submit" className="form-submit-btn">Update Profile</button>
                     
                     {formData.profile_description && (
-                        <button type="button" onClick={handleDeleteDescription}>Delete Description</button>
+                        <button type="button" onClick={handleDeleteDescription} className="form-delete-btn">
+                            Delete Description
+                        </button>
                     )}
+
+                    <a href="/">
+                        <button type="button" className="form-submit-btn">Home</button>
+                    </a>
                 </form>
             ) : (
-                <p>Loading...</p>
+                <p className="loading-text">Loading...</p>
             )}
         </div>
-    );
-};
+    )
+}
 
 export default ProfileUpdate;

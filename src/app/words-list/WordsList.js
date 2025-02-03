@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from "react";
+import "./WordsList.css"
 
 const WordsList = () => {
   const [words, setWords] = useState([]);
@@ -26,6 +27,10 @@ const WordsList = () => {
 
   const handleAddWord = async (e) => {
     e.preventDefault();
+    if (newWord.length !== 5) {
+      alert("Słowo musi mieć dokładnie 5 liter.");
+      return;
+  }
     try {
       const res = await fetch("http://localhost:3001/words", {
         method: "POST",
@@ -66,6 +71,10 @@ const WordsList = () => {
   };
 
   const handleUpdateWord = async (id) => {
+    if (newWord.length !== 5) {
+      alert("Słowo musi mieć dokładnie 5 liter.");
+      return;
+  }
     try {
       const res = await fetch(`http://localhost:3001/words/${id}`, {
         method: "PUT",
@@ -88,10 +97,10 @@ const WordsList = () => {
   };
 
   return (
-    <div>
-      <h1>Manage Words</h1>
+    <div className="words-container">
+      <h1 className="words-title">Manage Words</h1>
       
-      <form onSubmit={handleAddWord}>
+      <form onSubmit={handleAddWord} className="add-word-form">
         <input
           type="text"
           value={newWord}
@@ -99,14 +108,18 @@ const WordsList = () => {
           placeholder="Enter a new word"
           maxLength="10"
           required
+          className="word-input"
         />
-        <button type="submit">Add Word</button>
+        <button type="submit" className="add-word-btn">Add Word</button>
+        <a href="/">
+            <button type="button" className="add-word-btn">Home</button>
+        </a>
       </form>
 
-      <ul>
+      <ul className="words-list">
         {words.length > 0 ? (
           words.map((word) => (
-            <li key={word.id}>
+            <li key={word.id} className="word-item">
               {editingWordId === word.id ? (
                 <>
                   <input
@@ -114,23 +127,22 @@ const WordsList = () => {
                     value={editingWordValue}
                     onChange={(e) => setEditingWordValue(e.target.value.toUpperCase())}
                     maxLength="10"
+                    className="edit-word-input"
                   />
-                  <button onClick={() => handleUpdateWord(word.id)}>Save</button>
-                  <button onClick={() => setEditingWordId(null)}>Cancel</button>
+                  <button onClick={() => handleUpdateWord(word.id)} className="save-btn">Save</button>
+                  <button onClick={() => setEditingWordId(null)} className="cancel-btn">Cancel</button>
                 </>
               ) : (
                 <>
-                  {word.word}
-                  <button onClick={() => { setEditingWordId(word.id); setEditingWordValue(word.word); }}>
-                    Edit
-                  </button>
-                  <button onClick={() => handleDeleteWord(word.id)}>Delete</button>
+                  <span className="word-text">{word.word}</span>
+                  <button onClick={() => { setEditingWordId(word.id); setEditingWordValue(word.word); }} className="edit-btn">Edit</button>
+                  <button onClick={() => handleDeleteWord(word.id)} className="delete-btn">Delete</button>
                 </>
               )}
             </li>
           ))
         ) : (
-          <p>No words found</p>
+          <p className="no-words-text">No words found</p>
         )}
       </ul>
     </div>

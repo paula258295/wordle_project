@@ -5,7 +5,7 @@ import EditAccount from "./EditAccount";
 const EditProfilePage = () => {
   return (
   <div>
-    <EditAccount />;
+    <EditAccount />
   </div>
   )
 };

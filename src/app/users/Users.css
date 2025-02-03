@@ -19,7 +19,7 @@ form {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  box-shadow: 0 2px 12px rgb(230, 82, 188);
+  box-shadow: 0 2px 6px rgb(158, 31, 154);
 }
 
 input {
@@ -45,12 +45,11 @@ li {
   padding: 15px;
   margin: 10px 0;
   border-radius: 5px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: #333;
-  box-shadow: 0 2px 6px rgb(230, 82, 188);
+  box-shadow: 0 2px 6px rgb(158, 31, 154);
 }
 
 li button {
@@ -106,4 +105,10 @@ button {
 
 button:hover {
   background-color: #c33598;
+}
+
+div {
+  h2 {
+    color: #ddd;
+  }
 }

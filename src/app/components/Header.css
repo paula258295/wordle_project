@@ -93,3 +93,8 @@
   h2 {
     color: black;
   }
+
+  .admin-button, .notes-button {
+    background-color: #cc88f9;
+    color: white;
+  }

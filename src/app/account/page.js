@@ -40,7 +40,6 @@ const AccountPage = () => {
           <p><strong>Surname:</strong> {user.surname}</p>
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>Username:</strong> {user.username}</p>
-          <p><strong>Date of Birth:</strong> {new Date(user.dateofbirth).toISOString().split('T')[0]}</p>
         </div>
       </div>
       <div className="account-actions">

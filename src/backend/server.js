@@ -28,7 +28,7 @@ app.use(cookieParser());
 const saltRounds = 10;
 
 app.post("/users", async (req, res) => {
-    const { firstName, surname, dateOfBirth, email, password, username } = req.body;
+    const { firstName, surname, email, password, username } = req.body;
   
     try {
       const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
@@ -43,11 +43,10 @@ app.post("/users", async (req, res) => {
   
       const hashedPassword = await bcrypt.hash(password, saltRounds);
   
-      const formattedDateOfBirth = new Date(dateOfBirth).toISOString().split('T')[0];
   
       const result = await pool.query(
-        'INSERT INTO users (firstname, surname, email, dateofbirth, password, username) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-        [firstName, surname, email, formattedDateOfBirth, hashedPassword, username]
+        'INSERT INTO users (firstname, surname, email, password, username) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [firstName, surname, email, hashedPassword, username]
       );
   
       const newUser = result.rows[0];
@@ -56,7 +55,6 @@ app.post("/users", async (req, res) => {
         id: newUser.id,
         firstname: newUser.firstname,
         surname: newUser.surname,
-        dateofbirth: newUser.dateofbirth,
         email: newUser.email,
         username: newUser.username,
       });
@@ -177,7 +175,6 @@ app.post("/login", async (req, res) => {
           id: user.id,
           firstname: user.firstname,
           surname: user.surname,
-          dateofbirth: user.dateofbirth,
           email: user.email,
           username: user.username,
         },
@@ -206,7 +203,7 @@ app.get("/current-user", async (req, res) => {
   
     try {
       const result = await pool.query(
-        "SELECT id, firstname, surname, dateofbirth, email, username FROM users WHERE id = $1",
+        "SELECT id, firstname, surname, email, username, profile_description FROM users WHERE id = $1",
         [userId]
       );
   
@@ -220,9 +217,9 @@ app.get("/current-user", async (req, res) => {
         id: user.id,
         firstname: user.firstname,
         surname: user.surname,
-        dateofbirth: user.dateofbirth,
         email: user.email, 
-        username: user.username
+        username: user.username,
+        profile_description: user.profile_description || ""
       });
     } catch (err) {
       console.error(err);
@@ -406,14 +403,14 @@ app.put("/update-profile", async (req, res) => {
       return res.status(401).json({ error: "Not authenticated" });
   }
 
-  const { firstname, surname, dateOfBirth, username, email, profile_description } = req.body;
+  const { firstname, surname, username, email, profile_description } = req.body;
 
   try {
       const result = await pool.query(
           `UPDATE users 
-           SET firstname = $1, surname = $2, dateofbirth = $3, username = $4, email = $5, profile_description = $6
-           WHERE id = $7 RETURNING id, firstname, surname, dateofbirth, username, email, profile_description`,
-          [firstname, surname, dateOfBirth, username, email, profile_description, userId]
+           SET firstname = $1, surname = $2, username = $3, email = $4, profile_description = $5
+           WHERE id = $6 RETURNING id, firstname, surname, username, email, profile_description`,
+          [firstname, surname, username, email, profile_description, userId]
       );
 
       if (result.rowCount === 0) {

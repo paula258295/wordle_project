@@ -47,8 +47,6 @@ const UserList = () => {
   const handleAddUser = async (e) => {
     e.preventDefault();
 
-    const formattedDate = new Date(newUser.dateofbirth).toISOString().split('T')[0];
-
     try {
       const response = await fetch('http://localhost:3001/users', {
         method: 'POST',
@@ -62,7 +60,6 @@ const UserList = () => {
           email: newUser.email,
           password: newUser.password,
           username: newUser.username,
-          dateOfBirth: formattedDate,
         }),
       });
 
@@ -70,6 +67,14 @@ const UserList = () => {
         const user = await response.json();
         console.log('User added:', user);
         setUsers([...users, user]);
+
+        setNewUser({
+          firstname: '',
+          surname: '',
+          email: '',
+          password: '',
+          username: '',
+        });
       } else {
         console.error('Failed to add user');
       }

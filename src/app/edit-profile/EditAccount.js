@@ -8,7 +8,6 @@ const ProfileUpdate = () => {
     const [formData, setFormData] = useState({
         firstname: "",
         surname: "",
-        dateofbirth: "",
         username: "",
         email: "",
         profile_description: ""
@@ -19,22 +18,26 @@ const ProfileUpdate = () => {
             try {
                 const res = await fetch("http://localhost:3001/current-user", { credentials: "include" });
                 if (!res.ok) throw new Error("Failed to fetch user");
+                
                 const data = await res.json();
+                if (!data) {
+                    console.error("No user data received");
+                    return;
+                }
+        
                 setUser(data);
-
-                const formattedDate = new Date(data.dateofbirth).toISOString().split('T')[0];
                 setFormData({
                     firstname: data.firstname,
                     surname: data.surname,
-                    dateofbirth: formattedDate,
                     username: data.username,
                     email: data.email,
-                    profile_description: data.profile_description || ""
+                    profile_description: data.profile_description || "",
                 });
             } catch (error) {
                 console.error("Error fetching user:", error);
             }
         };
+        
         fetchUser();
     }, []);
 
@@ -73,6 +76,7 @@ const ProfileUpdate = () => {
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
             });
+
 
             if (!res.ok) {
                 const errorData = await res.json();
@@ -120,18 +124,6 @@ const ProfileUpdate = () => {
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="dateofbirth" className="form-label">Date of Birth</label>
-                            <input
-                                type="date"
-                                id="dateofbirth"
-                                name="dateofbirth"
-                                value={formData.dateofbirth}
-                                onChange={handleChange}
-                                required
-                                className="form-input"
-                            />
-                        </div>
-                        <div className="form-group">
                             <label htmlFor="username" className="form-label">Username</label>
                             <input
                                 type="text"
@@ -172,7 +164,7 @@ const ProfileUpdate = () => {
                     
                     <button type="submit" className="form-submit-btn">Update Profile</button>
                     
-                    {formData.profile_description && (
+                    {user.profile_description && formData.profile_description && (
                         <button type="button" onClick={handleDeleteDescription} className="form-delete-btn">
                             Delete Description
                         </button>

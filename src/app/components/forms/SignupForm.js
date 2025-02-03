@@ -15,7 +15,6 @@ export function SignupForm() {
     initialValues: {
       firstName: "",
       surname: "",
-      dateOfBirth: "",
       username: "",
       email: "",
       password: "",
@@ -36,9 +35,6 @@ export function SignupForm() {
           /^[A-Za-z]+$/,
           "Surname must not contain special characters or numbers"
         ),
-      dateOfBirth: Yup.date()
-        .max(new Date(), "Date of birth must be in the past")
-        .required("Date of birth is required"),
       username: Yup.string()
         .min(3, "Must be at least 3 characters")
         .max(20, "Must be 20 characters or less")
@@ -140,21 +136,6 @@ export function SignupForm() {
               />
               {formik.touched.surname && formik.errors.surname && (
                 <div className="error">{formik.errors.surname}</div>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="dateOfBirth">Date of birth</label>
-              <input
-                id="dateOfBirth"
-                name="dateOfBirth"
-                type="date"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.dateOfBirth}
-              />
-              {formik.touched.dateOfBirth && formik.errors.dateOfBirth && (
-                <div className="error">{formik.errors.dateOfBirth}</div>
               )}
             </div>
 

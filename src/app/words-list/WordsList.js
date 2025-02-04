@@ -11,7 +11,7 @@ const WordsList = () => {
 
   const fetchWords = async () => {
     try {
-      const res = await fetch("http://localhost:3001/words", { credentials: "include" });
+      const res = await fetch("https://localhost:3001/words", { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch words");
 
       const data = await res.json();
@@ -32,7 +32,7 @@ const WordsList = () => {
       return;
   }
     try {
-      const res = await fetch("http://localhost:3001/words", {
+      const res = await fetch("https://localhost:3001/words", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -55,7 +55,7 @@ const WordsList = () => {
 
   const handleDeleteWord = async (id) => {
     try {
-      const res = await fetch(`http://localhost:3001/words/${id}`, {
+      const res = await fetch(`https://localhost:3001/words/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -76,7 +76,7 @@ const WordsList = () => {
       return;
   }
     try {
-      const res = await fetch(`http://localhost:3001/words/${id}`, {
+      const res = await fetch(`https://localhost:3001/words/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

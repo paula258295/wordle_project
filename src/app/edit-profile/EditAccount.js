@@ -16,7 +16,7 @@ const ProfileUpdate = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const res = await fetch("http://localhost:3001/current-user", { credentials: "include" });
+                const res = await fetch("https://localhost:3001/current-user", { credentials: "include" });
                 if (!res.ok) throw new Error("Failed to fetch user");
                 
                 const data = await res.json();
@@ -48,7 +48,7 @@ const ProfileUpdate = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch("http://localhost:3001/update-profile", {
+            const res = await fetch("https://localhost:3001/update-profile", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -71,7 +71,7 @@ const ProfileUpdate = () => {
 
     const handleDeleteDescription = async () => {
         try {
-            const res = await fetch("http://localhost:3001/delete-profile-description", {
+            const res = await fetch("https://localhost:3001/delete-profile-description", {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",

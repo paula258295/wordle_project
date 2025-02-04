@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import "./signup.css";
 
-const API_URL = "http://localhost:3001";
+const API_URL = "https://localhost:3001";
 
 export function SignupForm() {
   const router = useRouter();

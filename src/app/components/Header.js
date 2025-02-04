@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import "./Header.css";
 
-const API_URL = "http://localhost:3001";
+const API_URL = "https://localhost:3001";
 
 const Header = () => {
   const [user, setUser] = useState(null);

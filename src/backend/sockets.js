@@ -1,18 +1,31 @@
 const express = require("express");
-const http = require("http");
+const https = require("https");
+const fs = require("fs");
 const { Server } = require("socket.io");
 const cors = require("cors");
 
 const app = express();
-const server = http.createServer(app);
+const port = 3002;
+
+const httpsOptions = {
+  key: fs.readFileSync("..//..//localhost-key.pem"),
+  cert: fs.readFileSync("..//..//localhost-cert.pem"),
+};
+
+const server = https.createServer(httpsOptions, app);
+
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://localhost:3000",
     methods: ["GET", "POST"]
   }
 });
 
-app.use(cors());
+app.use(cors({
+  origin: "https://localhost:3000",
+  credentials: true
+}));
+
 app.use(express.json());
 
 let chatHistory = [];
@@ -92,6 +105,6 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3002, () => {
-  console.log("Serwer WebSocket działa na porcie 3002");
+server.listen(port, () => {
+  console.log(`Serwer WebSocket działa na HTTPS: https://localhost:${port}`);
 });

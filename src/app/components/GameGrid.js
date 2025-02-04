@@ -3,8 +3,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import './GameGrid.css';
 import { io } from "socket.io-client";
 
-const socket = io("ws://localhost:3002");
-const API_URL = "http://localhost:3001";
+const socket = io("wss://localhost:3002");
+const API_URL = "https://localhost:3001";
 
 export default function GameGrid() {
   const [validWords, setValidWords] = useState([]);
@@ -42,7 +42,7 @@ export default function GameGrid() {
   useEffect(() => {
     const fetchWords = async () => {
       try {
-        const res = await fetch("http://localhost:3001/words", { credentials: "include" });
+        const res = await fetch("https://localhost:3001/words", { credentials: "include" });
         if (!res.ok) throw new Error("Failed to fetch words");
 
         const data = await res.json();

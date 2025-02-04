@@ -2,8 +2,13 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 const { Pool } = require("pg");
+const https = require("https");
+const fs = require("fs");
+
+const app = express();
+const port = 3001;
 
 const pool = new Pool({
   user: "postgres",
@@ -13,16 +18,36 @@ const pool = new Pool({
   port: 5432,
 });
 
-const app = express();
-const port = 3001;
-
-app.use(cors({
-  origin: "http://localhost:3000",
-  credentials: true,
-}));
-
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+const corsOptions = {
+  origin: "https://localhost:3000",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+
+app.options("*", cors(corsOptions));
+
+app.get("/", (req, res) => {
+  res.send("Backend 3001 działa HTTPS");
+});
+
+fetch("https://localhost:3001/current-user", {
+  method: "GET",
+  credentials: "include",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+const httpsOptions = {
+  key: fs.readFileSync("..//..//localhost-key.pem"),
+  cert: fs.readFileSync("..//..//localhost-cert.pem"),
+};
 
 
 const saltRounds = 10;
@@ -446,9 +471,10 @@ app.delete("/delete-profile-description", async (req, res) => {
   }
 });
 
-
-
-
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+https.createServer(httpsOptions, app).listen(port, () => {
+  console.log(`Backend działa na HTTPS: https://localhost:${port}`);
 });
+
+
+// export NODE_TLS_REJECT_UNAUTHORIZED=0
+// node server.js

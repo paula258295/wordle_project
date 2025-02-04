@@ -18,8 +18,8 @@ const UserList = () => {
 
   const fetchUsers = async (searchQuery = "") => {
     const url = searchQuery
-      ? `http://localhost:3001/users/search/${searchQuery}`
-      : "http://localhost:3001/users";
+      ? `https://localhost:3001/users/search/${searchQuery}`
+      : "https://localhost:3001/users";
 
     try {
       const res = await fetch(url, { credentials: "include" });
@@ -48,7 +48,7 @@ const UserList = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:3001/users', {
+      const response = await fetch('https://localhost:3001/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ const UserList = () => {
 
   const handleDeleteUser = async (userId) => {
     try {
-      const res = await fetch(`http://localhost:3001/users/${userId}`, {
+      const res = await fetch(`https://localhost:3001/users/${userId}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -107,7 +107,7 @@ const UserList = () => {
 
 
     try {
-      const res = await fetch(`http://localhost:3001/users/${currentUserId}`, {
+      const res = await fetch(`https://localhost:3001/users/${currentUserId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

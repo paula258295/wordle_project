@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import './Chat.css';
 
-const API_URL = "http://localhost:3001";
+const API_URL = "https://localhost:3001";
 
 async function fetchUser() {
   try {
@@ -37,7 +37,7 @@ export default function Chat() {
       if (userData) {
         setUser(userData);
 
-        const newSocket = io("ws://localhost:3002", {
+        const newSocket = io("wss://localhost:3002", {
           query: { username: userData.username },
         });
 

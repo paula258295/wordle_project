@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import "./AccountPage.css"
 
-const API_URL = "http://localhost:3001";
+const API_URL = "https://localhost:3001";
 
 const AccountPage = () => {
   const [user, setUser] = useState(null);

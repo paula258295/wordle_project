@@ -12,7 +12,7 @@ const NotesList = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("http://localhost:3001/current-user", { credentials: "include" });
+        const res = await fetch("https://localhost:3001/current-user", { credentials: "include" });
         if (!res.ok) throw new Error("Failed to fetch user");
 
         const data = await res.json();
@@ -30,7 +30,7 @@ const NotesList = () => {
 
   const fetchNotes = async () => {
     try {
-      const res = await fetch("http://localhost:3001/notes", { credentials: "include" });
+      const res = await fetch("https://localhost:3001/notes", { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch notes");
 
       setNotes(await res.json());
@@ -44,7 +44,7 @@ const NotesList = () => {
     if (!newNote.trim()) return;
 
     try {
-      const res = await fetch("http://localhost:3001/notes", {
+      const res = await fetch("https://localhost:3001/notes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -62,7 +62,7 @@ const NotesList = () => {
 
   const handleUpdateNote = async (noteId) => {
     try {
-      const res = await fetch(`http://localhost:3001/notes/${noteId}`, {
+      const res = await fetch(`https://localhost:3001/notes/${noteId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -82,7 +82,7 @@ const NotesList = () => {
     if (!window.confirm("Are you sure you want to delete this note?")) return;
 
     try {
-      const res = await fetch(`http://localhost:3001/notes/${noteId}`, {
+      const res = await fetch(`https://localhost:3001/notes/${noteId}`, {
         method: "DELETE",
         credentials: "include",
       });

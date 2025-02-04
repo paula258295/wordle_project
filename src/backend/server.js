@@ -223,7 +223,7 @@ app.post("/logout", (req, res) => {
 app.get("/current-user", async (req, res) => {
     const userId = req.cookies.userId;
     if (!userId) {
-      return res.status(401).json({ error: "Not authenticated" });
+      return res.json(null);
     }
   
     try {
@@ -439,7 +439,7 @@ app.put("/update-profile", async (req, res) => {
       );
 
       if (result.rowCount === 0) {
-          return res.status(404).json({ error: "User not found" });
+          return res.status.json({ error: "User not found" });
       }
 
       res.json(result.rows[0]);

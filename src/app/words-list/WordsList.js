@@ -71,7 +71,7 @@ const WordsList = () => {
   };
 
   const handleUpdateWord = async (id) => {
-    if (newWord.length !== 5) {
+    if (editingWordValue.length !== 5) {
       alert("Słowo musi mieć dokładnie 5 liter.");
       return;
   }

@@ -32,6 +32,18 @@ let chatHistory = [];
 let activeUsers = {};
 let uniqueUsers = new Set();
 
+let userWins = {}; 
+
+const getLeader = () => {
+  let leader = { username: '', wins: 0 };
+  for (let userId in userWins) {
+    if (userWins[userId] > leader.wins) {
+      leader = { username: userId, wins: userWins[userId] };
+    }
+  }
+  return leader;
+};
+
 io.on("connection", (socket) => {
   console.log("Użytkownik połączony:", socket.id);
 
@@ -53,34 +65,6 @@ io.on("connection", (socket) => {
     io.emit("receiveMessage", message);
   });
 
-  socket.on("disconnect", () => {
-    console.log(`Użytkownik rozłączony: ${socket.id}`);
-    
-    if (activeUsers[socket.id]) {
-      delete activeUsers[socket.id];
-      uniqueUsers = new Set(Object.values(activeUsers));
-      io.emit("updateUsers", Array.from(uniqueUsers));
-    }
-  });
-});
-
-let userWins = {}; 
-
-const getLeader = () => {
-  let leader = { username: '', wins: 0 };
-  for (let userId in userWins) {
-    if (userWins[userId] > leader.wins) {
-      leader = { username: userId, wins: userWins[userId] };
-    }
-  }
-  return leader;
-};
-
-io.on("connection", (socket) => {
-  console.log("Użytkownik połączony:", socket.id);
-
-  const username = socket.handshake.query.username;
-  
   if (username) {
     activeUsers[socket.id] = username;
     console.log(`Zidentyfikowano użytkownika ${username}`);
@@ -99,12 +83,18 @@ io.on("connection", (socket) => {
     }
   });
 
+
   socket.on("disconnect", () => {
     console.log(`Użytkownik rozłączony: ${socket.id}`);
-    delete activeUsers[socket.id];
-  });
-});
+    
+    if (activeUsers[socket.id]) {
+      delete activeUsers[socket.id];
+      uniqueUsers = new Set(Object.values(activeUsers));
+      io.emit("updateUsers", Array.from(uniqueUsers));
+    }
+  })
+})
 
 server.listen(port, () => {
   console.log(`Serwer WebSocket działa na HTTPS: https://localhost:${port}`);
-});
+})

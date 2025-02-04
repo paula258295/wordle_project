@@ -63,7 +63,7 @@ export default function Chat() {
   
 
   if (!user) {
-    return <p>User loading...</p>;
+    return;
   }
 
   return (
